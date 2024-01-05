@@ -27,7 +27,7 @@ export default function RootLayout({
         <ModalProvider />
         <main
           className="flex min-h-screen w-full flex-col bg-gray-950 
-          py-16 font-montserrat text-white"
+         font-montserrat text-white"
         >
           {children}
         </main>

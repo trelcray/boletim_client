@@ -9,6 +9,7 @@ import * as z from "zod";
 
 import { useRegisterModal } from "@/hooks/use-register-modal";
 import { cn } from "@/lib/utils";
+import { IErrorResponse, fetchWrapper } from "@/services/fetch";
 
 import { Badge } from "../ui/badge";
 import {
@@ -80,7 +81,7 @@ export const RegisterModal: React.FC<IRegisterModalProps> = ({}) => {
     setIsLoading(true);
 
     try {
-      const response = await fetch("http://localhost:8081/result", {
+      const response = await fetchWrapper<IErrorResponse>("result", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -88,10 +89,8 @@ export const RegisterModal: React.FC<IRegisterModalProps> = ({}) => {
         body: JSON.stringify(values),
       });
 
-      const responseData = await response.json();
-
-      if (responseData.status === "error") {
-        return toast.error(responseData.message);
+      if (response.status === "error") {
+        return toast.error(response.message);
       }
       toast.success("Registrado!");
       registerModal.onClose();

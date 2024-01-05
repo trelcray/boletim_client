@@ -13,6 +13,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { useDeleteModal } from "@/hooks/use-delete-modal";
+import { IErrorResponse, fetchWrapper } from "@/services/fetch";
 
 import { Button } from "../ui/button";
 
@@ -32,17 +33,15 @@ export const DeleteModal = ({}) => {
     setIsLoading(true);
 
     try {
-      const response = await fetch(
-        `http://localhost:8081/result/${currentId}`,
+      const response = await fetchWrapper<IErrorResponse>(
+        `result/${currentId}`,
         {
           method: "DELETE",
         }
       );
 
-      const responseData = await response.json();
-
-      if (responseData.status === "error") {
-        return toast.error(responseData.message ?? "Erro ao deletar.");
+      if (response.status === "error") {
+        return toast.error(response.message ?? "Erro ao deletar.");
       }
       toast.success("Deletado!");
       deleteModal.onClose();
