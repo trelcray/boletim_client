@@ -1,5 +1,7 @@
-/** @type {import('tailwindcss').Config} */
-module.exports = {
+import type { Config } from "tailwindcss";
+import { fontFamily } from "tailwindcss/defaultTheme";
+
+const config: Config = {
   darkMode: ["class"],
   content: [
     "./pages/**/*.{ts,tsx}",
@@ -16,7 +18,18 @@ module.exports = {
       },
     },
     extend: {
+      fontFamily: {
+        montserrat: ["var(--font-montserrat)", ...fontFamily.sans],
+      },
       colors: {
+        green: { 500: "#05FF00", 900: "#05A2C2" },
+        purple: { 600: "#9B19C2" },
+        orange: { 600: "#C26719" },
+        yellow: { 600: "#E9FF1A" },
+        cyan: { 500: "#05A2C2" },
+        red: { 400: "#FF5964" },
+        gray: { 50: "#ECECEC", 100: "#FFFF99", 950: "#0F0F0F" },
+        pink: { 500: "#CC4090" },
         border: "hsl(var(--border))",
         input: "hsl(var(--input))",
         ring: "hsl(var(--ring))",
@@ -58,12 +71,12 @@ module.exports = {
       },
       keyframes: {
         "accordion-down": {
-          from: { height: 0 },
+          from: { height: "0" },
           to: { height: "var(--radix-accordion-content-height)" },
         },
         "accordion-up": {
           from: { height: "var(--radix-accordion-content-height)" },
-          to: { height: 0 },
+          to: { height: "0" },
         },
       },
       animation: {
@@ -74,3 +87,5 @@ module.exports = {
   },
   plugins: [require("tailwindcss-animate")],
 };
+
+export default config;

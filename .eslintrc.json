@@ -37,11 +37,9 @@
   "rules": {
     "prettier/prettier": "error",
     "react/react-in-jsx-scope": "off",
-    "no-console": "error",
     "tailwindcss/no-custom-classname": "off",
     "tailwindcss/classnames-order": "error",
     "linebreak-style": ["error", "unix"],
-    "camelcase": "error",
     "quotes": ["error", "double"],
     "semi": ["error", "always"]
   }
