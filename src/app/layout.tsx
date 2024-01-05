@@ -1,13 +1,19 @@
 import type { Metadata } from "next";
-import { Inter } from "next/font/google";
+import { Montserrat } from "next/font/google";
 
+import { Toaster } from "@/components/ui/sonner";
+import { ModalProvider } from "@/providers/modal-provider";
 import "@/styles/globals.css";
 
-const inter = Inter({ subsets: ["latin"] });
+const montserrat = Montserrat({
+  subsets: ["latin"],
+  weight: ["400", "500", "600", "700"],
+  variable: "--font-montserrat",
+});
 
 export const metadata: Metadata = {
-  title: "Next.js Boilerplate",
-  description: "Next.js 13.4 Boilerplate",
+  title: "frontend challenge",
+  description: "boletim frontend challenge",
 };
 
 export default function RootLayout({
@@ -16,8 +22,17 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en">
-      <body className={inter.className}>{children}</body>
+    <html lang="pt-BR">
+      <body className={montserrat.variable}>
+        <ModalProvider />
+        <main
+          className="flex min-h-screen w-full flex-col bg-gray-950 
+          py-16 font-montserrat text-white"
+        >
+          {children}
+        </main>
+        <Toaster richColors />
+      </body>
     </html>
   );
 }
