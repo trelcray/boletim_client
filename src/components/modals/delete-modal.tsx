@@ -1,7 +1,6 @@
 "use client";
 
-import { useState } from "react";
-
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 
 import {
@@ -18,7 +17,7 @@ import { IErrorResponse, fetchWrapper } from "@/services/fetch";
 import { Button } from "../ui/button";
 
 export const DeleteModal = ({}) => {
-  const [isLoading, setIsLoading] = useState(false);
+  const queryClient = useQueryClient();
 
   const currentId = useDeleteModal((state) => state.currentId);
   const deleteModal = useDeleteModal();
@@ -29,30 +28,33 @@ export const DeleteModal = ({}) => {
     }
   };
 
-  const handleResponse = async () => {
-    setIsLoading(true);
+  const fetchData = async () => {
+    const response = await fetchWrapper<IErrorResponse>(`result/${currentId}`, {
+      method: "DELETE",
+    });
 
-    try {
-      const response = await fetchWrapper<IErrorResponse>(
-        `result/${currentId}`,
-        {
-          method: "DELETE",
-        }
-      );
+    if (response.status === "error") {
+      throw new Error(response.message ?? "Erro ao deletar.");
+    }
 
-      if (response.status === "error") {
-        return toast.error(response.message ?? "Erro ao deletar.");
-      }
+    return response;
+  };
+
+  const { isPending, mutate } = useMutation({
+    mutationFn: () => fetchData(),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["results"] });
       toast.success("Deletado!");
       deleteModal.onClose();
-    } catch (error) {
-      console.error("Erro na requisição:", (error as Error).message);
-      toast.error(
-        (error as Error).message ?? "Erro ao processar a requisição."
-      );
-    } finally {
-      setIsLoading(false);
-    }
+    },
+    onError: (error: Error) => {
+      console.error("Erro na requisição:", error.message);
+      toast.error(error.message ?? "Erro ao processar a requisição.");
+    },
+  });
+
+  const handleResponse = () => {
+    mutate();
   };
 
   return (
@@ -71,8 +73,8 @@ export const DeleteModal = ({}) => {
                 size="lg"
                 radius="xl"
                 className="bg-red-400 hover:bg-red-500"
-                disabled={isLoading}
-                isLoading={isLoading}
+                disabled={isPending}
+                isLoading={isPending}
                 onClick={handleResponse}
               >
                 <span className="text-base font-semibold text-gray-950">

@@ -1,4 +1,8 @@
+"use client";
+
 import { Suspense } from "react";
+
+import { useSuspenseQuery } from "@tanstack/react-query";
 
 import { Section } from "@/components/section";
 import { fetchWrapper } from "@/services/fetch";
@@ -13,9 +17,17 @@ interface ResultProps {
   criadoEm: string;
 }
 
-export default async function Home() {
-  const { data } = await fetchWrapper<{ data: ResultProps[] }>("results", {
+async function fetchData() {
+  const response = await fetchWrapper<{ data: ResultProps[] }>("results", {
     cache: "no-store",
+  });
+  return response.data;
+}
+
+export default function Home() {
+  const { data = [] } = useSuspenseQuery({
+    queryKey: ["results"],
+    queryFn: fetchData,
   });
 
   return (
