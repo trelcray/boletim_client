@@ -8,7 +8,7 @@ export async function fetchWrapper<T = unknown>(
   init?: RequestInit | undefined
 ): Promise<T> {
   const response = await fetch(
-    `${process.env.NEXT_PUBLIC_BASE_URL}/${input}`,
+    `${process.env.NEXT_PUBLIC_BASE_URL}/api/v1/${input}`,
     init
   );
 
