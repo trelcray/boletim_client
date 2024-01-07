@@ -4,6 +4,7 @@ import { useState } from "react";
 import { useForm } from "react-hook-form";
 
 import { zodResolver } from "@hookform/resolvers/zod";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 import * as z from "zod";
 
@@ -42,8 +43,9 @@ const formSchema = z.object({
 });
 
 export const RegisterModal: React.FC<IRegisterModalProps> = ({}) => {
-  const [isLoading, setIsLoading] = useState(false);
   const [selectedBadge, setSelectedBadge] = useState<string>();
+
+  const queryClient = useQueryClient();
 
   const bimesterMappings: Record<string, string> = {
     "Bimestre 1": "PRIMEIRO",
@@ -60,16 +62,6 @@ export const RegisterModal: React.FC<IRegisterModalProps> = ({}) => {
     : "";
   const registerModal = useRegisterModal();
 
-  const handleBadgeClick = (badge: string) => {
-    setSelectedBadge(badge === selectedBadge ? undefined : badge);
-
-    form.setValue("bimestre", renameBimester);
-    form.setValue(
-      "disciplina",
-      badge as "Biologia" | "Artes" | "Geografia" | "Sociologia"
-    );
-  };
-
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -77,34 +69,54 @@ export const RegisterModal: React.FC<IRegisterModalProps> = ({}) => {
     },
   });
 
-  const onSubmit = async (values: z.infer<typeof formSchema>) => {
-    setIsLoading(true);
+  const handleBadgeClick = (badge: string) => {
+    setSelectedBadge(badge === selectedBadge ? "" : badge);
 
-    try {
-      const response = await fetchWrapper<IErrorResponse>("result", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(values),
-      });
+    form.setValue("bimestre", renameBimester);
 
-      if (response.status === "error") {
-        return toast.error(response.message);
-      }
+    form.setValue(
+      "disciplina",
+      badge as "Biologia" | "Artes" | "Geografia" | "Sociologia"
+    );
+  };
+
+  const fetchData = async (values: z.infer<typeof formSchema>) => {
+    const response = await fetchWrapper<IErrorResponse>("result", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(values),
+    });
+
+    if (response.status === "error") {
+      throw new Error(response.message ?? "Erro ao criar o resultado.");
+    }
+
+    return response;
+  };
+
+  const { isPending, mutate } = useMutation({
+    mutationFn: (values: z.infer<typeof formSchema>) => fetchData(values),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["results"] });
       toast.success("Registrado!");
       registerModal.onClose();
-    } catch (error) {
-      console.error("Erro na requisição:", (error as Error).message);
-      toast.error("Erro ao processar a requisição.");
-    } finally {
-      setIsLoading(false);
-    }
+      form.reset();
+    },
+    onError: (error: Error) => {
+      console.error("Erro na requisição:", error.message);
+      toast.error(error.message ?? "Erro ao processar a requisição.");
+    },
+  });
+
+  const onSubmit = (values: z.infer<typeof formSchema>) => {
+    mutate(values);
   };
 
   return (
     <Modal
-      disabled={isLoading}
+      disabled={isPending}
       title={currentBimester as string}
       isOpen={registerModal.isOpen}
       onClose={registerModal.onClose}

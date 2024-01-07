@@ -24,7 +24,12 @@
       }
     }
   ],
-  "plugins": ["@typescript-eslint", "prettier", "tailwindcss"],
+  "plugins": [
+    "@typescript-eslint",
+    "prettier",
+    "tailwindcss",
+    "@tanstack/query"
+  ],
   "settings": {
     "react": {
       "version": "detect"
