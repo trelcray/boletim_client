@@ -46,7 +46,6 @@
     "@commitlint/cli": "^18.4.3",
     "@commitlint/config-conventional": "^18.4.3",
     "@tanstack/eslint-plugin-query": "^5.17.7",
-    "@tanstack/react-query-next-experimental": "^5.17.8",
     "@trivago/prettier-plugin-sort-imports": "^4.3.0",
     "@typescript-eslint/eslint-plugin": "^6.17.0",
     "@typescript-eslint/parser": "^6.17.0",
